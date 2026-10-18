@@ -94,6 +94,14 @@ function hanziNum(n) {
 	return cn.numberToChinese(n).replace("零", "〇");
 }
 
+function shortHanziNum(n) {
+	return cn.numberToChinese(n)
+		.replace("零", "〇")
+		.replace("二十", "廿")
+		.replace("三十", "卅")
+		.replace("四十", "卌");
+}
+
 function hanziDigits(n) {
 	return [...String(n)]
 		.map(d => DIGITS[d])
@@ -101,7 +109,7 @@ function hanziDigits(n) {
 }
 
 function temperatureText(temp) {
-	return hanziNum(Math.round(temp)) + DEGREE_SYMBOL;
+	return shortHanziNum(Math.round(temp)) + DEGREE_SYMBOL;
 }
 
 /**
@@ -325,6 +333,7 @@ function updateWeather(lat, long) {
 			(lunarDay == 1)
 			? lunarDate.getMonth() + MONTH
 			: (DAYS_OF_MONTH[lunarDay] ?? "");
+		console.log(dayOfMonth);
 
 		setText('today-solar-term', jieQi ?? dayOfMonth);
 		setText('today-weather', WEATHER_CODES[weather.daily.weather_code[0]]);
