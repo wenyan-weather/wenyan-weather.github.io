@@ -253,7 +253,7 @@ function updateWeather(lat, long) {
 		);
 		let adjustedDir = (weather.current.wind_direction_10m + DIR_INTERVAL) % DEGREES_IN_CIRCLE;
 		let windDir = DIRECTIONS[Math.floor(adjustedDir / DIR_INTERVAL)];
-		let windSpeed = `一小時${hanziNum(weather.current.wind_speed_10m)}公里`;
+		let windSpeed = `一小時${hanziNum(Math.round(weather.current.wind_speed_10m))}公里`;
 
 		setText('curr-weather', WEATHER_CODES[weather.current.weather_code] + LONG_SPACE + currTemp);
 		setText('wind-info', windDir + LONG_SPACE + windSpeed);
