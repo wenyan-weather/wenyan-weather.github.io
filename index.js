@@ -79,7 +79,7 @@ function setText(id, text) {
 }
 
 function hanziNum(n) {
-	return cn.numberToChinese(n);
+	return cn.numberToChinese(n).replace("零", "〇");
 }
 
 function hanziDigits(n) {
