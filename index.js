@@ -261,7 +261,7 @@ function updateWeather(lat, long) {
 		);
 		let adjustedDir = (weather.current.wind_direction_10m + DIR_INTERVAL) % DEGREES_IN_CIRCLE;
 		let windDir = DIRECTIONS[Math.floor(adjustedDir / DIR_INTERVAL)];
-		let windSpeed = `一小時${hanziNum(Math.round(weather.current.wind_speed_10m))}公里`;
+		let windSpeed = `一小時${shortHanziNum(Math.round(weather.current.wind_speed_10m))}公里`;
 
 		setText('curr-weather', WEATHER_CODES[weather.current.weather_code] + LONG_SPACE + currTemp);
 		setText('wind-info', windDir + LONG_SPACE + windSpeed);
@@ -333,7 +333,6 @@ function updateWeather(lat, long) {
 			(lunarDay == 1)
 			? lunarDate.getMonth() + MONTH
 			: (DAYS_OF_MONTH[lunarDay] ?? "");
-		console.log(dayOfMonth);
 
 		setText('today-solar-term', jieQi ?? dayOfMonth);
 		setText('today-weather', WEATHER_CODES[weather.daily.weather_code[0]]);
@@ -341,14 +340,18 @@ function updateWeather(lat, long) {
 		setText('today-low', temperatureText(weather.daily.temperature_2m_min[0]));
 
 		for(let i = 1; i < weather.daily.time.length; ++i) {
-			console.log("day " + String(i));
 			let date = weather.daily.time[i];
 			let lunarDate = Lunar.fromDate(date);
+			let lunarDay = lunarDate.getDay();
 			let yaoriDay = 曜日順序[date.getDay()];
 			let jiaziDay = lunarDate.getDayInGanZhi();
 
 			let jieQiSimplified = lunarDate.getJieQi();
 			let jieQi = SOLAR_TERMS_TRADITIONAL[jieQiSimplified] ?? jieQiSimplified;
+			let dayOfMonth =
+				(lunarDay == 1)
+				? lunarDate.getMonth() + MONTH
+				: (DAYS_OF_MONTH[lunarDay] ?? "");
 
 			let newRow = document.createElement('tr');
 			let jieqiEl = document.createElement('td');
@@ -357,7 +360,7 @@ function updateWeather(lat, long) {
 			let highEl = document.createElement('td');
 			let lowEl = document.createElement('td');
 
-			jieqiEl.textContent = jieQi;
+			jieqiEl.textContent = jieQi ?? dayOfMonth;
 			headerEl.textContent = jiaziDay + LONG_SPACE + yaoriDay;
 			weatherEl.textContent = WEATHER_CODES[weather.daily.weather_code[i]];
 			highEl.textContent = temperatureText(weather.daily.temperature_2m_max[i]);
