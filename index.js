@@ -366,14 +366,16 @@ function updateDate(currDate) {
 	);
 }
 
-function updateEverything() {
+setInterval(() => {
+	updateDate(new Date());
+}, 5 * 1000);
+
+setInterval(() => {
 	navigator.geolocation.getCurrentPosition((position) => {
 		updateWeather(position.coords.latitude, position.coords.longitude);
 	});
+}, 30 * 1000);
 
-	updateDate(new Date());
-}
-
-setInterval(updateEverything, 30 * 1000);
-
-updateEverything();
+navigator.geolocation.getCurrentPosition((position) => {
+	updateWeather(position.coords.latitude, position.coords.longitude);
+});
