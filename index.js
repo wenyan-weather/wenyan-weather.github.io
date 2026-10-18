@@ -326,7 +326,7 @@ function updateWeather(lat, long) {
 			? lunarDate.getMonth() + MONTH
 			: (DAYS_OF_MONTH[lunarDay] ?? "");
 
-		setText('today-solar-term', jieQi);
+		setText('today-solar-term', jieQi ?? dayOfMonth);
 		setText('today-weather', WEATHER_CODES[weather.daily.weather_code[0]]);
 		setText('today-high', temperatureText(weather.daily.temperature_2m_max[0]));
 		setText('today-low', temperatureText(weather.daily.temperature_2m_min[0]));
@@ -390,6 +390,11 @@ function updateDate(currDate) {
 	);
 }
 
+updateDate(new Date());
+navigator.geolocation.getCurrentPosition((position) => {
+	updateWeather(position.coords.latitude, position.coords.longitude);
+});
+
 setInterval(() => {
 	updateDate(new Date());
 }, 5 * 1000);
@@ -399,8 +404,3 @@ setInterval(() => {
 		updateWeather(position.coords.latitude, position.coords.longitude);
 	});
 }, 30 * 1000);
-
-updateDate(new Date());
-navigator.geolocation.getCurrentPosition((position) => {
-	updateWeather(position.coords.latitude, position.coords.longitude);
-});
