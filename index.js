@@ -334,7 +334,7 @@ function updateWeather(lat, long) {
 			? lunarDate.getMonth() + MONTH
 			: (DAYS_OF_MONTH[lunarDay] ?? "");
 
-		setText('today-solar-term', jieQi ?? dayOfMonth);
+		setText('today-solar-term', jieQi ? jieQi : dayOfMonth);
 		setText('today-weather', WEATHER_CODES[weather.daily.weather_code[0]]);
 		setText('today-high', temperatureText(weather.daily.temperature_2m_max[0]));
 		setText('today-low', temperatureText(weather.daily.temperature_2m_min[0]));
@@ -362,7 +362,7 @@ function updateWeather(lat, long) {
 			let highEl = document.createElement('td');
 			let lowEl = document.createElement('td');
 
-			jieqiEl.textContent = jieQi ?? dayOfMonth;
+			jieqiEl.textContent = jieQi ? jieQi : dayOfMonth;
 			headerEl.textContent = jiaziDay + LONG_SPACE + yaoriDay;
 			weatherEl.textContent = WEATHER_CODES[weather.daily.weather_code[i]];
 			highEl.textContent = temperatureText(weather.daily.temperature_2m_max[i]);
