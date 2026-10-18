@@ -353,6 +353,8 @@ function updateWeather(lat, long) {
 				? lunarDate.getMonth() + MONTH
 				: (DAYS_OF_MONTH[lunarDay] ?? "");
 
+			console.log(lunarDay, jieQi, dayOfMonth);
+
 			let newRow = document.createElement('tr');
 			let jieqiEl = document.createElement('td');
 			let headerEl = document.createElement('th');
