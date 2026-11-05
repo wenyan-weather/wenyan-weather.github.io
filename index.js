@@ -210,42 +210,6 @@ async function getWeather(lat, long) {
 	return weatherData;
 }
 
-/**
- * A sexagenary cycle index.
- * 
- * The number passed to the constructor is zero-indexed. For example,
- * normally 辛酉 is 58, but my representation of 辛酉 in this class is
- * constructed by `new 干支(57)`, and `this.天干 === 7` as well as
- * `this.地支 === 9`. This is because the majority of operations do not
- * actually involve displaying the underlying numbers and so it is
- * easier to keep the number zero-indexed.
- * 
- * If the number is `< 0` or `>= 60`, the number will be clipped into
- * the correct range so that the conversion will give the correct result.
- * 
- * `toNumber()` returns whatever was passed into the constructor, so it will
- * be one off from what a human would expect.
- */
-class 干支 {
-	constructor(n) {
-		let m = mod(n, 干支配數);
-		this.天干 = m % 天干順序.length;
-		this.地支 = m % 地支順序.length;
-	}
-
-	toNumber() {
-		let tens = (this.天干 - this.地支) >> 1;
-		if (tens < 0) {
-			tens += 6;
-		}
-		return tens * 10 + this.天干;
-	}
-
-	toString() {
-		return 天干順序[this.天干] + 地支順序[this.地支];
-	}
-}
-
 function updateWeather(lat, long) {
 	getWeather(lat, long).then(weather => {
 		console.log(weather);
