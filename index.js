@@ -323,7 +323,6 @@ function updateWeather(lat, long) {
 			(lunarDay == 1)
 			? lunarDate.getMonth() + MONTH
 			: (DAYS_OF_MONTH[lunarDay] ?? "");
-		console.log(dayOfMonth);
 
 		setText('today-solar-term', jieQi ? jieQi : dayOfMonth);
 		setText('today-weather', WEATHER_CODES[weather.daily.weather_code[0]]);
