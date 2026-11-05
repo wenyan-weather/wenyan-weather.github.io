@@ -86,14 +86,24 @@ const DIGITS = "〇一二三四五六七八九";
 const 曜日順序 = "日月火水木金土";
 const 干支配數 = 60;
 
+/**
+ * Sets the textContent of an element.
+ */
 function setText(id, text) {
 	document.getElementById(id).textContent = String(text);
 }
 
+/**
+ * Converts a number to a Hanzi string, with zero displayed as 〇.
+ */
 function hanziNum(n) {
 	return cn.numberToChinese(n).replace("零", "〇");
 }
 
+/**
+ * Converts a number to a Hanzi string, with zero displayed as 〇.
+ * For conciseness, 20 is displayed as 廿, 30 as 卅, and 40 as 卌.
+ */
 function shortHanziNum(n) {
 	return cn.numberToChinese(n)
 		.replace("零", "〇")
@@ -102,12 +112,22 @@ function shortHanziNum(n) {
 		.replace("四十", "卌");
 }
 
+/**
+ * Converts a number to a Hanzi string where each digit is written out.
+ * 
+ * For example, 239 becomes 二三九.
+ */
 function hanziDigits(n) {
 	return [...String(n)]
 		.map(d => DIGITS[d])
 		.join('');
 }
 
+/**
+ * Converts a temperature as a Number to text indicating that it is a temperature.
+ * 
+ * For example, 13.9 becomes 十四度.
+ */
 function temperatureText(temp) {
 	return shortHanziNum(Math.round(temp)) + DEGREE_SYMBOL;
 }
@@ -120,6 +140,9 @@ function jiaziHour(hourNum) {
 	return 地支順序[halfHourIdx] + "正初"[hourNum % 2];
 }
 
+/**
+ * Gets the ke number based on the number of minutes that have passed in this hour.
+ */
 function keFromMins(mins) {
 	let ke = Math.floor(mins / 15);
 	return ke == 0 ? "" : hanziNum(ke) + KE;
@@ -210,6 +233,9 @@ async function getWeather(lat, long) {
 	return weatherData;
 }
 
+/**
+ * Update weather widgets.
+ */
 function updateWeather(lat, long) {
 	getWeather(lat, long).then(weather => {
 		console.log(weather);
@@ -340,6 +366,9 @@ function updateWeather(lat, long) {
 	})
 }
 
+/**
+ * Update the current date on the date widget.
+ */
 function updateDate(currDate) {
 	let lunarDate = Lunar.fromDate(currDate);
 
@@ -362,9 +391,7 @@ function updateDate(currDate) {
 	let jieQiSimplified = lunarDate.getPrevJieQi().getName();
 	let jieQi = SOLAR_TERMS_TRADITIONAL[jieQiSimplified] ?? jieQiSimplified;
 
-	setText('curr-jieqi',
-		jieQi
-	);
+	setText('curr-jieqi', jieQi);
 }
 
 updateDate(new Date());
