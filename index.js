@@ -157,6 +157,30 @@ function mod(a, b) {
 	return ((a % b) + b) % b
 }
 
+/**
+ * Lunar info about a date object.
+ */
+class LunarDateInfo {
+	constructor(date) {
+		this.lunarDate = Lunar.fromDate(date);
+		this.lunarDay = lunarDate.getDay();
+		this.yaori = 曜日順序[date.getDay()];
+		this.jiazi = lunarDate.getDayInGanZhi();
+
+		// Get jieQi, but we need to convert from simp to trad
+		let jieQiSimplified = lunarDate.getJieQi();
+		this.jieQi = SOLAR_TERMS_TRADITIONAL[jieQiSimplified] ?? jieQiSimplified;
+
+		// On special days of the month, as defined by DAYS_OF_MONTH, we need to display the day of the month
+		let specialLunarDay =
+			(lunarDay == 1)
+			? hanziNum(lunarDate.getMonth()) + MONTH
+			: (DAYS_OF_MONTH[lunarDay] ?? "");
+		// If it's a jieqi start day, that takes precedence
+		this.specialDayString = this.jieQi ? this.jieQi : specialLunarDay;
+	}
+}
+
 async function getWeather(lat, long) {
 	const params = {
 		latitude: lat,
@@ -244,13 +268,17 @@ function updateWeather(lat, long) {
 
 		let actTemp = Math.round(weather.current.temperature_2m);
 		let feelTemp = Math.round(weather.current.apparent_temperature);
+		// We only display "feels like" if the feels like temp is diff from true temp
 		let currTemp = temperatureText(actTemp) + (
 			(actTemp === feelTemp)
 				? ("")
 				: (LONG_SPACE + FEELS_LIKE + temperatureText(feelTemp))
 		);
+
+		// Find the cardinal wind direction
 		let adjustedDir = (weather.current.wind_direction_10m + DIR_INTERVAL) % DEGREES_IN_CIRCLE;
 		let windDir = DIRECTIONS[Math.floor(adjustedDir / DIR_INTERVAL)];
+
 		let windSpeed = `一小時${shortHanziNum(Math.round(weather.current.wind_speed_10m))}公里`;
 
 		setText('curr-weather', WEATHER_CODES[weather.current.weather_code] + LONG_SPACE + currTemp);
@@ -315,33 +343,16 @@ function updateWeather(lat, long) {
 		}
 
 		// Set current weather
-		let lunarDate = Lunar.fromDate(weather.current.time);
-		let lunarDay = lunarDate.getDay();
-		let jieQiSimplified = lunarDate.getJieQi();
-		let jieQi = SOLAR_TERMS_TRADITIONAL[jieQiSimplified] ?? jieQiSimplified;
-		let dayOfMonth =
-			(lunarDay == 1)
-			? lunarDate.getMonth() + MONTH
-			: (DAYS_OF_MONTH[lunarDay] ?? "");
+		let todayInfo = new LunarDateInfo(weather.current.time);
 
-		setText('today-solar-term', jieQi ? jieQi : dayOfMonth);
+		setText('today-solar-term', todayInfo.specialDayString);
 		setText('today-weather', WEATHER_CODES[weather.daily.weather_code[0]]);
 		setText('today-high', temperatureText(weather.daily.temperature_2m_max[0]));
 		setText('today-low', temperatureText(weather.daily.temperature_2m_min[0]));
 
+		// For each day, add a line for its info
 		for(let i = 1; i < weather.daily.time.length; ++i) {
-			let date = weather.daily.time[i];
-			let lunarDate = Lunar.fromDate(date);
-			let lunarDay = lunarDate.getDay();
-			let yaoriDay = 曜日順序[date.getDay()];
-			let jiaziDay = lunarDate.getDayInGanZhi();
-
-			let jieQiSimplified = lunarDate.getJieQi();
-			let jieQi = SOLAR_TERMS_TRADITIONAL[jieQiSimplified] ?? jieQiSimplified;
-			let dayOfMonth =
-				(lunarDay == 1)
-				? lunarDate.getMonth() + MONTH
-				: (DAYS_OF_MONTH[lunarDay] ?? "");
+			let currDayInfo = new LunarDateInfo(weather.daily.time[i]);
 
 			let newRow = document.createElement('tr');
 			let jieqiEl = document.createElement('td');
@@ -350,8 +361,8 @@ function updateWeather(lat, long) {
 			let highEl = document.createElement('td');
 			let lowEl = document.createElement('td');
 
-			jieqiEl.textContent = jieQi ? jieQi : dayOfMonth;
-			headerEl.textContent = jiaziDay + LONG_SPACE + yaoriDay;
+			jieqiEl.textContent = currDayInfo.specialDayString;
+			headerEl.textContent = currDayInfo.jiazi + LONG_SPACE + currDayInfo.yaori;
 			weatherEl.textContent = WEATHER_CODES[weather.daily.weather_code[i]];
 			highEl.textContent = temperatureText(weather.daily.temperature_2m_max[i]);
 			lowEl.textContent = temperatureText(weather.daily.temperature_2m_min[i]);
