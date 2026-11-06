@@ -163,19 +163,19 @@ function mod(a, b) {
 class LunarDateInfo {
 	constructor(date) {
 		this.lunarDate = Lunar.fromDate(date);
-		this.lunarDay = lunarDate.getDay();
+		this.lunarDay = this.lunarDate.getDay();
 		this.yaori = 曜日順序[date.getDay()];
-		this.jiazi = lunarDate.getDayInGanZhi();
+		this.jiazi = this.lunarDate.getDayInGanZhi();
 
 		// Get jieQi, but we need to convert from simp to trad
-		let jieQiSimplified = lunarDate.getJieQi();
+		let jieQiSimplified = this.lunarDate.getJieQi();
 		this.jieQi = SOLAR_TERMS_TRADITIONAL[jieQiSimplified] ?? jieQiSimplified;
 
 		// On special days of the month, as defined by DAYS_OF_MONTH, we need to display the day of the month
 		let specialLunarDay =
 			(lunarDay == 1)
-			? hanziNum(lunarDate.getMonth()) + MONTH
-			: (DAYS_OF_MONTH[lunarDay] ?? "");
+			? hanziNum(this.lunarDate.getMonth()) + MONTH
+			: (DAYS_OF_MONTH[this.lunarDay] ?? "");
 		// If it's a jieqi start day, that takes precedence
 		this.specialDayString = this.jieQi ? this.jieQi : specialLunarDay;
 	}
@@ -240,7 +240,12 @@ async function getWeather(lat, long) {
 		daily: {
 			time: Array.from(
 				{ length: (Number(daily.timeEnd()) - Number(daily.time())) / daily.interval() }, 
-				(_ , i) => new Date((Number(daily.time()) + i * daily.interval()) * 1000)
+				(_ , i) => {
+					// OpenMeteo provided most of the code in this section through a generator on their website, which would have returned the following here:
+					// new Date((Number(daily.time()) + i * daily.interval()) * 1000)
+					// This works except when there is a daylight savings time transition causing a day to be 25 hours, for example. In this case, adding 24 hours to midnight on the day of the transition will land on 23:00 on the same day, which will cause the same day to display twice. My corrected approach is below:
+					
+				}
 			),
 			temperature_2m_max: daily.variables(0).valuesArray(),
 			temperature_2m_min: daily.variables(1).valuesArray(),
