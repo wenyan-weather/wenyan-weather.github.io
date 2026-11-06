@@ -244,7 +244,7 @@ async function getWeather(lat, long) {
 					// OpenMeteo provided most of the code in this section through a generator on their website, which would have returned the following here:
 					// new Date((Number(daily.time()) + i * daily.interval()) * 1000)
 					// This works except when there is a daylight savings time transition causing a day to be 25 hours, for example. In this case, adding 24 hours to midnight on the day of the transition will land on 23:00 on the same day, which will cause the same day to display twice. My corrected approach is below:
-					let date = new Date(Number(daily.time()));
+					let date = new Date(1000 * Number(daily.time()));
 					date.setDate(date.getDate() + i);
 					return date;
 				}
