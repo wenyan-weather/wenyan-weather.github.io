@@ -173,7 +173,7 @@ class LunarDateInfo {
 
 		// On special days of the month, as defined by DAYS_OF_MONTH, we need to display the day of the month
 		let specialLunarDay =
-			(lunarDay == 1)
+			(this.lunarDay == 1)
 			? hanziNum(this.lunarDate.getMonth()) + MONTH
 			: (DAYS_OF_MONTH[this.lunarDay] ?? "");
 		// If it's a jieqi start day, that takes precedence
