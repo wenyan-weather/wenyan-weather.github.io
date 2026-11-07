@@ -509,7 +509,6 @@ function updateWeather(lat, long) {
 function updateDate() {
 	let currDate = new Date();
 	let lunarDate = Lunar.fromDate(currDate);
-	let temporalDate = currDate.toTemporalInstant();
 
 	let calendarName = document.getElementById('year-numbering-select').value;
 	let calendarInfo = CALENDARS[calendarName];
