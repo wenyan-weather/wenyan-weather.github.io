@@ -210,6 +210,10 @@ function zeroType() {
 	return document.getElementById('zero-symbol-select').value;
 }
 
+function shortNumsEnabled() {
+	return document.getElementById('short-nums-select').checked;
+}
+
 /**
  * Sets the textContent of an element.
  */
@@ -232,10 +236,15 @@ function hanziNum(n) {
  * For conciseness, 20 is displayed as 廿, 30 as 卅, and 40 as 卌.
  */
 function shortHanziNum(n) {
-	return hanziNum(n)
-		.replace("二十", "廿")
-		.replace("三十", "卅")
-		.replace("四十", "卌");
+	let longNum = hanziNum(n);
+	if (shortNumsEnabled()) {
+		return longNum
+			.replace("二十", "廿")
+			.replace("三十", "卅")
+			.replace("四十", "卌");
+	} else {
+		return longNum;
+	}
 }
 
 /**
