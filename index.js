@@ -118,9 +118,8 @@ const JAPAN_CALENDAR_FORMATTER = new Intl.DateTimeFormat('ja-JP-u-ca-japanese', 
 const CALENDARS = {
 	"western": {
 		"name": "西曆",
-		// 1 AD
-		"epoch": new Date("+000001-01-01T00:00:00Z"),
-		"gregorian": true
+		"gregorian": true,
+		"getYearName": date => hanziDigits(date.getFullYear()),
 	},
 	"japan": {
 		"name": "日本曆",
@@ -141,8 +140,10 @@ const CALENDARS = {
 	"huangdi": {
 		"name": "黃帝紀年",
 		"gregorian": false,
-		// 2697 BC. ISO 8601 years in BC appear one off bc there is year 0
-		"epoch": new Date("-002696-01-01T00:00:00Z")
+		"getYearName": date => shortHanziNum(
+			// 2697 BC
+			lunarYearsSince(-2696, date)
+		)
 	},
 	"kouki": {
 		"name": "皇紀",
@@ -162,7 +163,14 @@ const CALENDARS = {
 		// 1912
 		"epoch": new Date("+001912-01-01T00:00:00Z")
 	},
-	"murica": {
+	"murica-lunar": {
+		"name": "星條旗",
+		"gregorian": false,
+		"getYearName": date => shortHanziNum(
+			lunarYearsSince(1776, date)
+		)
+	},
+	"murica-solar": {
 		"name": "星條旗",
 		"gregorian": true,
 		// July 4, 1776
@@ -248,6 +256,15 @@ function hanziDigits(n) {
  */
 function temperatureText(temp) {
 	return shortHanziNum(Math.round(temp)) + DEGREE_SYMBOL;
+}
+
+/**
+ * Calculates the number of full lunar years between the start of the given lunar year and `date`.
+ * @param {*} year A Gregorian calendar year. Note that, for example, Gregorian January 10, 2007 belongs to 2006 in the lunar calendar because the 2007 lunar new year had not yet begun on January 10.
+ * @param {*} date The date to count years from.
+ */
+function lunarYearsSince(year, date) {
+	return Lunar.fromDate(date).getYear() - year + 1
 }
 
 /**

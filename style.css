@@ -19,7 +19,7 @@ b {
     margin-bottom: 10px;
 }
 
-footer {
+footer, .notice {
     font-size: small;
 }
 
