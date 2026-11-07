@@ -554,7 +554,6 @@ function updateDate() {
 	let jieQiSimplified = lunarDate.getPrevJieQi().getName();
 	let jieQi = SOLAR_TERMS_TRADITIONAL[jieQiSimplified] ?? jieQiSimplified;
 
-	// TODO Why doesn't this work
 	setText('curr-jieqi', jieQi);
 }
 
