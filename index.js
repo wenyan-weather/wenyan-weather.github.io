@@ -559,7 +559,7 @@ function updateDate() {
 
 	setText('western-date', altDate);
 
-	let jieQiSimplified = lunarDate.getPrevJieQi().getName();
+	let jieQiSimplified = lunarDate.getPrevJieQi(true).getName();
 	let jieQi = SOLAR_TERMS_TRADITIONAL[jieQiSimplified] ?? jieQiSimplified;
 
 	setText('curr-jieqi', jieQi);
