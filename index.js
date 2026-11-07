@@ -2,6 +2,7 @@
 
 import { fetchWeatherApi } from "https://esm.sh/openmeteo";
 import * as cn from "https://unpkg.com/chinese-numbering@1.x/bundle/es.js";
+import { differenceInYears } from 'https://cdn.skypack.dev/date-fns';
 
 const HOURLY_WEATHER_ID = 'hourly';
 
@@ -82,9 +83,124 @@ const DAYS_OF_MONTH = {
 
 const 天干順序 = "甲乙丙丁戊己庚辛壬癸";
 const 地支順序 = "子丑寅卯辰巳午未申酉戌亥";
-const DIGITS = "〇一二三四五六七八九";
+const DIGITS = {
+	"circle": "〇一二三四五六七八九",
+	"char": "零一二三四五六七八九"
+};
 const 曜日順序 = "日月火水木金土";
-const 干支配數 = 60;
+
+const WEEKDAY_NAMES = {
+	"yaori": "日月火水木金土",
+	"number": "日一二三四五六",
+	"mansions": [
+		"星房虛昴",
+		"張心危畢",
+		"翼尾室觜",
+		"軫箕壁參",
+		"角斗奎井",
+		"亢牛婁鬼",
+		"氐女胃柳"
+	]
+}
+
+const WEEKDAY_NAME_PREFIX = {
+	"yaori": "曜日",
+	"number": "星期",
+	"mansions": ""
+}
+
+const JAPAN_CALENDAR_FORMATTER = new Intl.DateTimeFormat('ja-JP-u-ca-japanese', {
+	era: 'long',
+	year: 'numeric'
+});
+
+// "gregorian" refers to whether the months and days are counted by the Gregorian calendar. If false, the lunar months and days are used.
+const CALENDARS = {
+	"western": {
+		"name": "西曆",
+		// 1 AD
+		"epoch": new Date("+000001-01-01T00:00:00Z"),
+		"gregorian": true
+	},
+	"japan": {
+		"name": "日本曆",
+		"gregorian": true,
+		"getYearName": date => {
+			const parts = JAPAN_CALENDAR_FORMATTER.formatToParts(date);
+			const era = parts.find(p => p.type === 'era').value;
+			const year = parts.find(p => p.type === 'year').value;
+			return `${era}${shortHanziNum(year)}`;
+		}
+	},
+	"taiwan": {
+		"name": "中華民國",
+		// 1912
+		"epoch": new Date("+001912-01-01T00:00:00Z"),
+		"gregorian": true,
+	},
+	"huangdi": {
+		"name": "黃帝紀年",
+		"gregorian": false,
+		// 2697 BC. ISO 8601 years in BC appear one off bc there is year 0
+		"epoch": new Date("-002696-01-01T00:00:00Z")
+	},
+	"kouki": {
+		"name": "皇紀",
+		"gregorian": true,
+		// 660 BC
+		"epoch": new Date("-000659-01-01T00:00:00Z")
+	},
+	"dangun": {
+		"name": "檀君",
+		"gregorian": true,
+		// 2333 BC
+		"epoch": new Date("-002332-01-01T00:00:00Z")
+	},
+	"juche": {
+		"name": "主體",
+		"gregorian": true,
+		// 1912
+		"epoch": new Date("+001912-01-01T00:00:00Z")
+	},
+	"murica": {
+		"name": "星條旗",
+		"gregorian": true,
+		// July 4, 1776
+		"epoch": new Date("+001776-07-04T00:00:00Z")
+	}
+};
+
+/**
+ * Lunar info about a date object.
+ */
+class LunarDateInfo {
+	constructor(date) {
+		this.lunarDate = Lunar.fromDate(date);
+		this.lunarDay = this.lunarDate.getDay();
+		this.yaori = 曜日順序[date.getDay()];
+		this.jiazi = this.lunarDate.getDayInGanZhi();
+
+		// Get jieQi, but we need to convert from simp to trad
+		let jieQiSimplified = this.lunarDate.getJieQi();
+		this.jieQi = SOLAR_TERMS_TRADITIONAL[jieQiSimplified] ?? jieQiSimplified;
+
+		// On special days of the month, as defined by DAYS_OF_MONTH, we need to display the day of the month
+		let specialLunarDay =
+			(this.lunarDay == 1)
+			? hanziNum(this.lunarDate.getMonth()) + MONTH
+			: (DAYS_OF_MONTH[this.lunarDay] ?? "");
+		// If it's a jieqi start day, that takes precedence
+		this.specialDayString = this.jieQi ? this.jieQi : specialLunarDay;
+	}
+}
+
+function weekdayType() {
+	return document.getElementById('weekday-type-select').value;
+}
+
+function zeroType() {
+	return document.getElementById('zero-symbol-select').value;
+}
 
 /**
  * Sets the textContent of an element.
@@ -97,7 +213,10 @@ function setText(id, text) {
  * Converts a number to a Hanzi string, with zero displayed as 〇.
  */
 function hanziNum(n) {
-	return cn.numberToChinese(n).replace("零", "〇");
+	return cn.numberToChinese(n)
+		.replace("零", "")
+		.replace("〇", "")
+		.replace("一十", "十");
 }
 
 /**
@@ -105,8 +224,7 @@ function hanziNum(n) {
  * For conciseness, 20 is displayed as 廿, 30 as 卅, and 40 as 卌.
  */
 function shortHanziNum(n) {
-	return cn.numberToChinese(n)
-		.replace("零", "〇")
+	return hanziNum(n)
 		.replace("二十", "廿")
 		.replace("三十", "卅")
 		.replace("四十", "卌");
@@ -119,7 +237,7 @@ function shortHanziNum(n) {
  */
 function hanziDigits(n) {
 	return [...String(n)]
-		.map(d => DIGITS[d])
+		.map(d => DIGITS[zeroType()][d])
 		.join('');
 }
 
@@ -155,30 +273,6 @@ function keFromMins(mins) {
  */
 function mod(a, b) {
 	return ((a % b) + b) % b
-}
-
-/**
- * Lunar info about a date object.
- */
-class LunarDateInfo {
-	constructor(date) {
-		this.lunarDate = Lunar.fromDate(date);
-		this.lunarDay = this.lunarDate.getDay();
-		this.yaori = 曜日順序[date.getDay()];
-		this.jiazi = this.lunarDate.getDayInGanZhi();
-
-		// Get jieQi, but we need to convert from simp to trad
-		let jieQiSimplified = this.lunarDate.getJieQi();
-		this.jieQi = SOLAR_TERMS_TRADITIONAL[jieQiSimplified] ?? jieQiSimplified;
-
-		// On special days of the month, as defined by DAYS_OF_MONTH, we need to display the day of the month
-		let specialLunarDay =
-			(this.lunarDay == 1)
-			? hanziNum(this.lunarDate.getMonth()) + MONTH
-			: (DAYS_OF_MONTH[this.lunarDay] ?? "");
-		// If it's a jieqi start day, that takes precedence
-		this.specialDayString = this.jieQi ? this.jieQi : specialLunarDay;
-	}
 }
 
 async function getWeather(lat, long) {
@@ -386,42 +480,93 @@ function updateWeather(lat, long) {
 /**
  * Update the current date on the date widget.
  */
-function updateDate(currDate) {
+function updateDate() {
+	let currDate = new Date();
 	let lunarDate = Lunar.fromDate(currDate);
+	let temporalDate = currDate.toTemporalInstant();
+
+	let calendarName = document.getElementById('year-numbering-select').value;
+	let calendarInfo = CALENDARS[calendarName];
+
+	// Build up the year name
+
+	let yearName;
+	if (calendarInfo.epoch) {
+		let yearNum = 1 + differenceInYears(currDate, calendarInfo.epoch);
+		yearName = yearNum == 1 ? "元" : shortHanziNum(yearNum);
+	} else {
+		yearName = calendarInfo.getYearName(currDate);
+	}
+	yearName += YEAR;
+
+	// Other components of a date
+
+	let dayOfWeek = 曜日順序[currDate.getDay()] + "曜日";
+	let ganzhi = lunarDate.getDayInGanZhi();
+
+	let lunarMonthDay =
+		lunarDate.getMonthInChinese() + MONTH
+		+ lunarDate.getDayInChinese();
+
+	let altTime = shortHanziNum(currDate.getHours()) + "時" + shortHanziNum(currDate.getMinutes()) + "分";
+	let chineseTime = jiaziHour(currDate.getHours()) + keFromMins(currDate.getMinutes());
+
+	// Build up the full alt date
+
+	let altDate = yearName;
+
+	if (calendarInfo.gregorian) {
+		altDate += shortHanziNum(currDate.getMonth() + 1) + MONTH
+			+ shortHanziNum(currDate.getDate()) + DAY;
+	} else {
+		altDate += lunarMonthDay;
+	}
+	altDate += LONG_SPACE + dayOfWeek + LONG_SPACE + altTime;
+
+	setText('alt-calendar-name', calendarInfo.name);
 
 	setText('lunar-date',
 		lunarDate.getYearInGanZhiExact() + YEAR
-		+ lunarDate.getMonthInChinese() + MONTH
-		+ lunarDate.getDayInChinese()
-		+ LONG_SPACE + lunarDate.getDayInGanZhi()
-		+ LONG_SPACE + jiaziHour(currDate.getHours()) + keFromMins(currDate.getMinutes())
+		+ lunarMonthDay
+		+ LONG_SPACE + ganzhi
+		+ LONG_SPACE + chineseTime
 	);
 
-	setText('western-date',
-		hanziDigits(currDate.getFullYear()) + YEAR
-		+ hanziNum(currDate.getMonth() + 1) + MONTH
-		+ hanziNum(currDate.getDate()) + DAY
-		+ LONG_SPACE + 曜日順序[currDate.getDay()] + "曜日"
-		+ LONG_SPACE + hanziNum(currDate.getHours()) + "時" + hanziNum(currDate.getMinutes()) + "分"
-	);
+	setText('western-date', altDate);
 
 	let jieQiSimplified = lunarDate.getPrevJieQi().getName();
 	let jieQi = SOLAR_TERMS_TRADITIONAL[jieQiSimplified] ?? jieQiSimplified;
 
+	// TODO Why doesn't this work
 	setText('curr-jieqi', jieQi);
 }
 
-updateDate(new Date());
+// Update everything on load
+updateDate();
 navigator.geolocation.getCurrentPosition((position) => {
 	updateWeather(position.coords.latitude, position.coords.longitude);
 });
 
+// Update date widget every 5 secs
 setInterval(() => {
-	updateDate(new Date());
+	updateDate();
 }, 5 * 1000);
 
+// Update weather every 30 secs
 setInterval(() => {
 	navigator.geolocation.getCurrentPosition((position) => {
 		updateWeather(position.coords.latitude, position.coords.longitude);
 	});
 }, 30 * 1000);
+
+// User changed a setting
+document.addEventListener('input', event => {
+    // Check if the changed element is an input or a select
+    if (['INPUT', 'SELECT'].includes(event.target.tagName)) {
+        updateDate();
+
+		navigator.geolocation.getCurrentPosition((position) => {
+			updateWeather(position.coords.latitude, position.coords.longitude);
+		});
+    }
+});

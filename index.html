@@ -24,7 +24,7 @@
       </span>
 
       <span class="one-line">
-        <b>西曆</b>
+        <b id="alt-calendar-name">西曆</b>
         <span id="western-date">不明</span>
       </span>
     </div>
@@ -53,8 +53,47 @@
       </tr>
     </table>
 
+    <div id="settings">
+      <h3>設</h3>
+
+      <table>
+        <tr>
+          <td><label for="weekday-type-select">週日名</label></td>
+          <td><select name="weekday-type" id="weekday-type-select">
+            <option value="yaori">曜日</option>
+            <option value="number">星期</option>
+            <option value="mansions">二十八宿</option>
+          </select></td>
+        </tr>
+        <tr>
+          <td><label for="year-numbering-select">年號</label></td>
+          <td><select name="year-numbering" id="year-numbering-select">
+            <option value="western">西曆</option>
+            <option value="japan">年号（日本）</option>
+            <option value="taiwan">中華民國</option>
+            <option value="huangdi">黃帝（華夏）</option>
+            <option value="kouki">皇紀（日本）</option>
+            <option value="dangun">檀君（大韓民國）</option>
+            <option value="juche">主體（北朝鮮）</option>
+            <option value="murica">星條旗（美國）</option>
+          </select></td>
+        </tr>
+        <tr>
+          <td><label for="zero-symbol-select">無數代字</label></td>
+          <td><select name="zero-symbol" id="zero-symbol-select">
+            <option value="circle">〇</option>
+            <option value="char">零</option>
+          </select></td>
+        </tr>
+        <tr>
+          <td><label for="short-nums-select">廿卅卌省字</label></td>
+          <td><input type="checkbox" name="short-nums" id="short-nums-select" checked></td>
+        </tr>
+      </table>
+    </div>
+
+    <h3>注</h3>
     <footer>
-      <h3>注</h3>
       建本站者號<u>巍洰</u>。欲輔建本站，請適<a href="https://github.com/wenyan-weather/wenyan-weather.github.io">Github</a>。
       本站以<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>用<a href="https://open-meteo.com/">Open-Meteo</a>，氣候求焉。
     </footer>
