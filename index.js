@@ -220,7 +220,7 @@ const SPEED_LABELS = {
 	"kmh": s => `一小時${s}公里`,
 	"mph": s => `一小時${s}英里`,
 	"knots": s => `${s}節`,
-	"kmh": s => `一秒${s}米`
+	"mps": s => `一秒${s}米`
 };
 
 /**
