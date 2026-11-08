@@ -735,7 +735,7 @@ setInterval(() => {
 	navigator.geolocation.getCurrentPosition((position) => {
 		updateWeather(position.coords.latitude, position.coords.longitude);
 	});
-}, 30 * 1000);
+}, 60 * 1000);
 
 // User changed a setting
 document.addEventListener('input', event => {
