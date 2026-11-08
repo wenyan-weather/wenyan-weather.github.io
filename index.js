@@ -456,7 +456,7 @@ function updateWeather(lat, long) {
 			}
 		});
 
-		let gust = roundedWindSpeed == roundedGustSpeed ? "" : (`俄一小時${shortHanziNum(roundedGustSpeed)}公里` + LONG_SPACE);
+		let gust = roundedWindSpeed == roundedGustSpeed ? "" : (`俄風一小時${shortHanziNum(roundedGustSpeed)}公里` + LONG_SPACE);
 		let windSpeed = `一小時${shortHanziNum(roundedWindSpeed)}公里`;
 
 		setText('curr-weather', WEATHER_CODES[weather.current.weather_code] + LONG_SPACE + currTemp);
