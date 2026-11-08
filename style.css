@@ -24,6 +24,9 @@ h1 {
 
 h3 {
     margin-left: 0px;
+    margin-right: 0px;
+    display: inline;
+    font-weight: bolder;
 }
 
 b {
@@ -32,6 +35,7 @@ b {
 
 .notice {
     font-size: small;
+    display: inline;
 }
 
 /* 1. Unvisited link (Default state) */
@@ -68,8 +72,7 @@ a:active {
 
 .widget {
     height: fit-content;
-    /* background-color: color-mix(in srgb, blanchedalmond 80%, transparent); */
-    background-color: transparent;
+    background-color: color-mix(in srgb, blanchedalmond 20%, transparent);
     border-radius: 5px;
     padding: 10px;
     margin-left: 10px;
