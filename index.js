@@ -277,7 +277,6 @@ function dayOfWeek(date, long) {
 	switch (weekdayType()) {
 		case "yaori": {
 			let short = 曜日順序[date.getDay()];
-			console.log(short);
 			return long ? short + "曜日" : short;
 		}
 		case "number": {
