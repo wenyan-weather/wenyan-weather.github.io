@@ -349,7 +349,7 @@ async function getWeather(lat, long) {
 	// Note: The order of weather variables in the URL query and the indices below need to match!
 	const weatherData = {
 		current: {
-			time: new Date((Number(curr.time()) + utcOffsetSec) * 1000),
+			time: new Date((Number(curr.time())) * 1000),
 			temperature_2m: curr.variables(0).value(),
 			relative_humidity_2m: curr.variables(1).value(),
 			apparent_temperature: curr.variables(2).value(),
@@ -360,7 +360,7 @@ async function getWeather(lat, long) {
 			rain: curr.variables(7).value(),
 			showers: curr.variables(8).value(),
 			snowfall: curr.variables(9).value(),
-			weather_code: hourly.variables(10).value(),
+			weather_code: curr.variables(10).value(),
 		},
 		hourly: {
 			time: Array.from(
