@@ -64,6 +64,26 @@ const WEATHER_CODES = {
 	"99": "雷大雹"
 };
 
+const BEAUFORT_SCALE = {
+	0: "無風",
+	5: "軟風",
+	11: "輕風",
+	19: "微風",
+	30: "和風",
+	40: "清風",
+	50: "強風",
+	61: "疾風",
+	74: "大風",
+	88: "烈風",
+	102: "狂風",
+	117: "暴風",
+	132: "颶風",
+
+	149: "輕度颱風",
+	184: "中度颱風",
+	999: "強烈颱風"
+};
+
 // This is needed bc the Lunar library outputs solar terms in simplified
 const SOLAR_TERMS_TRADITIONAL = {
 	"惊蛰": "驚蟄",
@@ -426,11 +446,18 @@ function updateWeather(lat, long) {
 		// Find the cardinal wind direction
 		let adjustedDir = (weather.current.wind_direction_10m + DIR_INTERVAL) % DEGREES_IN_CIRCLE;
 		let windDir = DIRECTIONS[Math.floor(adjustedDir / DIR_INTERVAL)];
+		let roundedWindSpeed = Math.round(weather.current.wind_speed_10m);
 
-		let windSpeed = `一小時${shortHanziNum(Math.round(weather.current.wind_speed_10m))}公里`;
+		let beaufortScale;
+		Object.entries(BEAUFORT_SCALE).forEach(([maxWindSpd, name]) => {
+			if (roundedWindSpeed <= maxWindSpd)
+				beaufortScale = name;
+		});
+
+		let windSpeed = `一小時${shortHanziNum(roundedWindSpeed)}公里`;
 
 		setText('curr-weather', WEATHER_CODES[weather.current.weather_code] + LONG_SPACE + currTemp);
-		setText('wind-info', windDir + LONG_SPACE + windSpeed);
+		setText('wind-info', beaufortScale + LONG_SPACE + windSpeed + LONG_SPACE + windDir);
 
 		/* Hourly weather */
 
