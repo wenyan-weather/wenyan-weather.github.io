@@ -87,7 +87,6 @@ const DIGITS = {
 	"circle": "〇一二三四五六七八九",
 	"char": "零一二三四五六七八九"
 };
-const 曜日順序 = "日月火水木金土";
 
 const WEEKDAY_NAMES = {
 	"yaori": "日月火水木金土",
@@ -150,6 +149,14 @@ const CALENDARS = {
 		"gregorian": true,
 		// 660 BC
 		"epoch": new Date("-000659-01-01T00:00:00Z")
+	},
+	"buddhist": {
+		"name": "佛歷",
+		"gregorian": false,
+		"getYearName": date => hanziDigits(
+			Foto.fromLunar(Lunar.fromDate(date))
+				.getYear()
+		)
 	},
 	"dangun": {
 		"name": "檀君",
