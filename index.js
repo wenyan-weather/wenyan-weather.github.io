@@ -632,5 +632,8 @@ document.addEventListener('input', event => {
     // Check if the changed element is an input or a select
     if (['INPUT', 'SELECT'].includes(event.target.tagName)) {
         updateEverything();
+		let settingName = event.target.id || event.target.name;
+		let settingValue = event.target.type === "checkbox" ? event.target.checked : event.target.value;
+		localStorage.setItem(settingName, settingValue);
     }
 });
