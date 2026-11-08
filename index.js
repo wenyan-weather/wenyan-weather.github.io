@@ -188,7 +188,7 @@ class LunarDateInfo {
 	constructor(date) {
 		this.lunarDate = Lunar.fromDate(date);
 		this.lunarDay = this.lunarDate.getDay();
-		this.weekdayShort = dayOfWeek(currDate, false);
+		this.weekdayShort = dayOfWeek(date, false);
 		this.jiazi = this.lunarDate.getDayInGanZhi();
 		this.jieQi = replaceAll(this.lunarDate.getJieQi(), SOLAR_TERMS_TRADITIONAL);
 
