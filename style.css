@@ -3,23 +3,17 @@ body {
     font-size:large;
     font-family:cursive;
     padding: 10px;
-    background-image: url('photos/partlySunny.jpg');
+    background-image: url('photos/snowPellets.jpg');
 
-}
-
-#weather-image {
     background-attachment: fixed;
     background-size: cover;
     background-repeat: no-repeat;
     
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.55);
     background-blend-mode: multiply;
     
     color: white;
-}
-
-#no-weather-image {
-    color: default;
+    color-scheme: dark;
 }
 
 h1 {
@@ -75,8 +69,7 @@ a:active {
 .widget {
     height: fit-content;
     /* background-color: color-mix(in srgb, blanchedalmond 80%, transparent); */
-    background-color: blanchedalmond;
-    color: black;
+    background-color: transparent;
     border-radius: 5px;
     padding: 10px;
     margin-left: 10px;
