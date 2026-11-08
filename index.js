@@ -447,6 +447,7 @@ function updateWeather(lat, long) {
 		let adjustedDir = (weather.current.wind_direction_10m + DIR_INTERVAL) % DEGREES_IN_CIRCLE;
 		let windDir = DIRECTIONS[Math.floor(adjustedDir / DIR_INTERVAL)];
 		let roundedWindSpeed = Math.round(weather.current.wind_speed_10m);
+		let roundedGustSpeed = Math.round(weather.current.wind_gusts_10m);
 
 		let beaufortScale;
 		Object.entries(BEAUFORT_SCALE).forEach(([maxWindSpd, name]) => {
@@ -455,10 +456,11 @@ function updateWeather(lat, long) {
 			}
 		});
 
+		let gust = roundedWindSpeed == roundedGustSpeed ? "" : (`俄一小時${shortHanziNum(roundedGustSpeed)}公里` + LONG_SPACE);
 		let windSpeed = `一小時${shortHanziNum(roundedWindSpeed)}公里`;
 
 		setText('curr-weather', WEATHER_CODES[weather.current.weather_code] + LONG_SPACE + currTemp);
-		setText('wind-info', beaufortScale + LONG_SPACE + windSpeed + LONG_SPACE + windDir);
+		setText('wind-info', beaufortScale + LONG_SPACE + windSpeed + LONG_SPACE + gust + windDir);
 
 		/* Hourly weather */
 
