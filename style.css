@@ -3,6 +3,23 @@ body {
     font-size:large;
     font-family:cursive;
     padding: 10px;
+    background-image: url('photos/partlySunny.jpg');
+
+}
+
+#weather-image {
+    background-attachment: fixed;
+    background-size: cover;
+    background-repeat: no-repeat;
+    
+    background-color: rgba(0, 0, 0, 0.6);
+    background-blend-mode: multiply;
+    
+    color: white;
+}
+
+#no-weather-image {
+    color: default;
 }
 
 h1 {
@@ -19,8 +36,36 @@ b {
     margin-bottom: 10px;
 }
 
-footer, .notice {
+.notice {
     font-size: small;
+}
+
+/* 1. Unvisited link (Default state) */
+a:link {
+  color:skyblue;
+  text-decoration: none;
+}
+
+/* 2. Visited link (User has already clicked it) */
+a:visited {
+  color:darksalmon;
+  text-decoration: none;
+}
+
+/* 3. Focus state (User navigated via keyboard Tab key) */
+a:focus {
+  color:darksalmon;
+}
+
+/* 4. Hover state (Mouse cursor is over the link) */
+a:hover {
+  color:darkturquoise;
+  text-decoration: underline;
+}
+
+/* 5. Active state (The exact moment the link is being clicked) */
+a:active {
+  color: darksalmon;
 }
 
 .one-line {
@@ -29,12 +74,14 @@ footer, .notice {
 
 .widget {
     height: fit-content;
-    background-color:blanchedalmond;
+    /* background-color: color-mix(in srgb, blanchedalmond 80%, transparent); */
+    background-color: blanchedalmond;
+    color: black;
     border-radius: 5px;
     padding: 10px;
     margin-left: 10px;
     margin-right: 10px;
-    box-shadow: 2px 4px 4px hsl(0deg 0% 0% / 0.37)
+    box-shadow: 2px 4px 4px hsl(0deg 0% 0% / 0.37);
 }
 
 .force-rtl * {

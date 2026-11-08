@@ -84,6 +84,45 @@ const BEAUFORT_SCALE = {
 	184: "強烈颱風"
 };
 
+const WEATHER_IMAGES = {
+	"0": "clear",
+	"1": "partlySunny",
+	"2": "mostlyCloudy",
+	"3": "overcast",
+
+	"45": "fog",
+	"48": "fog",
+
+	"51": "drizzle",
+	"53": "drizzle",
+	"55": "drizzle",
+	"56": "drizzle",
+	"57": "drizzle",
+
+	"61": "rain",
+	"63": "rain",
+	"65": "rain",
+	"66": "rain",
+	"67": "rain",
+
+	"71": "heavySnow",
+	"73": "lightSnow",
+	"75": "heavySnow",
+
+	"77": "snowPellets",
+
+	"80": "rain",
+	"81": "rain",
+	"82": "rain",
+	"85": "rain",
+	"86": "rain",
+
+	"95": "thunder",
+	"96": "thunder",
+	"97": "heavyThunder",
+	"99": "heavyThunder"
+};
+
 // This is needed bc the Lunar library outputs solar terms in simplified
 const SOLAR_TERMS_TRADITIONAL = {
 	"惊蛰": "驚蟄",
@@ -495,6 +534,11 @@ function updateWeather(lat, long) {
 
 		setText('curr-weather', WEATHER_CODES[weather.current.weather_code] + LONG_SPACE + currTemp);
 		setText('wind-info', beaufortScale + LONG_SPACE + windText(windSpd) + LONG_SPACE + gust + windDir);
+
+		// Update background image
+		let imageName = WEATHER_IMAGES[weather.current.weather_code];
+		document.body.style.backgroundImage = `url('photos/${imageName}.jpg')`;
+		document.body.classList.add("weather-image");
 
 		/* Hourly weather */
 
