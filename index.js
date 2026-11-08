@@ -208,6 +208,21 @@ const TEMP_CONVERSIONS = {
 	"kelvin": c => c + 273.15
 };
 
+// Conversions from km/h to the given unit
+const SPEED_CONVERSIONS = {
+	"kmh": kmh => kmh,
+	"mph": kmh => kmh / 1.609,
+	"knots": kmh => kmh / 1.852,
+	"mps": kmh => kmh / 3.6
+};
+
+const SPEED_LABELS = {
+	"kmh": s => `一小時${s}公里`,
+	"mph": s => `一小時${s}英里`,
+	"knots": s => `${s}節`,
+	"kmh": s => `一秒${s}米`
+};
+
 /**
  * Lunar info about a date object.
  */
@@ -300,6 +315,17 @@ function temperatureText(tempCelsius) {
 	let tempUnit = document.getElementById('temp-unit-select').value;
 	let convertedTemp = TEMP_CONVERSIONS[tempUnit](tempCelsius);
 	return shortHanziNum(Math.round(convertedTemp)) + DEGREE_SYMBOL;
+}
+
+/**
+ * Converts a wind speed in km/h to text indicating the speed in the user's selected unit.
+ * 
+ * For example, 13.9 becomes 一小時十四公里, assuming the speed unit is km/h.
+ */
+function windText(speedKmh) {
+	let speedUnit = document.getElementById('wind-unit-select').value;
+	let convertedSpeed = SPEED_CONVERSIONS[speedUnit](speedKmh);
+	return SPEED_LABELS[speedUnit](shortHanziNum(Math.round(convertedSpeed)));
 }
 
 function dayOfWeek(date, long) {
@@ -455,21 +481,20 @@ function updateWeather(lat, long) {
 		// Find the cardinal wind direction
 		let adjustedDir = (weather.current.wind_direction_10m + DIR_INTERVAL) % DEGREES_IN_CIRCLE;
 		let windDir = DIRECTIONS[Math.floor(adjustedDir / DIR_INTERVAL)];
-		let roundedWindSpeed = Math.round(weather.current.wind_speed_10m);
-		let roundedGustSpeed = Math.round(weather.current.wind_gusts_10m);
+		let windSpd = weather.current.wind_speed_10m;
+		let gustSpd = weather.current.wind_gusts_10m;
 
 		let beaufortScale;
 		Object.entries(BEAUFORT_SCALE).forEach(([maxWindSpd, name]) => {
-			if (roundedWindSpeed >= maxWindSpd) {
+			if (windSpd >= Number(maxWindSpd)) {
 				beaufortScale = name;
 			}
 		});
 
-		let gust = roundedWindSpeed == roundedGustSpeed ? "" : (`俄風一小時${shortHanziNum(roundedGustSpeed)}公里` + LONG_SPACE);
-		let windSpeed = `一小時${shortHanziNum(roundedWindSpeed)}公里`;
+		let gust = windSpd == gustSpd ? "" : (`俄風${windText(gustSpd)}` + LONG_SPACE);
 
 		setText('curr-weather', WEATHER_CODES[weather.current.weather_code] + LONG_SPACE + currTemp);
-		setText('wind-info', beaufortScale + LONG_SPACE + windSpeed + LONG_SPACE + gust + windDir);
+		setText('wind-info', beaufortScale + LONG_SPACE + windText(windSpd) + LONG_SPACE + gust + windDir);
 
 		/* Hourly weather */
 
