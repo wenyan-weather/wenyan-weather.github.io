@@ -73,12 +73,25 @@ const SOLAR_TERMS_TRADITIONAL = {
 	"处暑": "處暑"
 };
 
+const MANSIONS_TRADITIONAL = {
+	"婁": "娄",
+	"毕": "畢",
+	"张": "張",
+	"轸": "軫"
+};
+
 const DAYS_OF_MONTH = {
 	5: "初五",
 	10: "初十",
 	15: "望",
 	20: "二十",
 	25: "廿五"
+};
+
+const NUMBER_ABBREVIATIONS = {
+	"二十": "廿",
+	"三十": "卅",
+	"四十": "卌"
 };
 
 const 天干順序 = "甲乙丙丁戊己庚辛壬癸";
@@ -88,25 +101,8 @@ const DIGITS = {
 	"char": "零一二三四五六七八九"
 };
 
-const WEEKDAY_NAMES = {
-	"yaori": "日月火水木金土",
-	"number": "日一二三四五六",
-	"mansions": [
-		"星房虛昴",
-		"張心危畢",
-		"翼尾室觜",
-		"軫箕壁參",
-		"角斗奎井",
-		"亢牛婁鬼",
-		"氐女胃柳"
-	]
-};
-
-const FULL_WEEKDAY_NAME = {
-	"yaori": name => name + "曜日",
-	"number": name => "星期" + name,
-	"mansions": name => name
-};
+const 曜日順序 = "日月火水木金土";
+const 星期順序 = "日一二三四五六";
 
 const JAPAN_CALENDAR_FORMATTER = new Intl.DateTimeFormat('ja-JP-u-ca-japanese', {
 	era: 'long',
@@ -192,12 +188,9 @@ class LunarDateInfo {
 	constructor(date) {
 		this.lunarDate = Lunar.fromDate(date);
 		this.lunarDay = this.lunarDate.getDay();
-		this.weekdayShort = weekdayShort(date);
+		this.weekdayShort = dayOfWeek(currDate, false);
 		this.jiazi = this.lunarDate.getDayInGanZhi();
-
-		// Get jieQi, but we need to convert from simp to trad
-		let jieQiSimplified = this.lunarDate.getJieQi();
-		this.jieQi = SOLAR_TERMS_TRADITIONAL[jieQiSimplified] ?? jieQiSimplified;
+		this.jieQi = replaceAll(this.lunarDate.getJieQi(), SOLAR_TERMS_TRADITIONAL);
 
 		// On special days of the month, as defined by DAYS_OF_MONTH, we need to display the day of the month
 		let specialLunarDay =
@@ -207,6 +200,19 @@ class LunarDateInfo {
 		// If it's a jieqi start day, that takes precedence
 		this.specialDayString = this.jieQi ? this.jieQi : specialLunarDay;
 	}
+}
+
+/**
+ * Makes a series of text replacements in a string.
+ * @param {*} text The text to transform.
+ * @param {*} replacements An object where the keys are the replacement targets and the value is the target.
+ * @returns The replaced string.
+ */
+function replaceAll(text, replacements) {
+	for (let [key, value] of Object.entries(replacements)) {
+		text = text.replace(key, value);
+	}
+	return text;
 }
 
 function weekdayType() {
@@ -244,14 +250,7 @@ function hanziNum(n) {
  */
 function shortHanziNum(n) {
 	let longNum = hanziNum(n);
-	if (shortNumsEnabled()) {
-		return longNum
-			.replace("二十", "廿")
-			.replace("三十", "卅")
-			.replace("四十", "卌");
-	} else {
-		return longNum;
-	}
+	return shortNumsEnabled() ? replaceAll(longNum, NUMBER_ABBREVIATIONS) : longNum;
 }
 
 /**
@@ -274,6 +273,22 @@ function temperatureText(temp) {
 	return shortHanziNum(Math.round(temp)) + DEGREE_SYMBOL;
 }
 
+function dayOfWeek(date, long) {
+	switch (weekdayType()) {
+		case "yaori": {
+			let short = 曜日順序[date.getDay()];
+			console.log(short);
+			return long ? short + "曜日" : short;
+		}
+		case "number": {
+			let short = 星期順序[date.getDay()];
+			return long ? "星期" + short : short;
+		}
+		case "mansions":
+			return replaceAll(Lunar.fromDate(date).getXiu(), MANSIONS_TRADITIONAL);
+	}
+}
+
 /**
  * Calculates the number of full lunar years between the start of the given lunar year and `date`.
  * @param {*} year A Gregorian calendar year. Note that, for example, Gregorian January 10, 2007 belongs to 2006 in the lunar calendar because the 2007 lunar new year had not yet begun on January 10.
@@ -281,14 +296,6 @@ function temperatureText(temp) {
  */
 function lunarYearsSince(year, date) {
 	return Lunar.fromDate(date).getYear() - year + 1
-}
-
-function weekdayShort(date) {
-	return WEEKDAY_NAMES[weekdayType()][date.getDay()];
-}
-
-function weekdayLong(date) {
-	return FULL_WEEKDAY_NAME[weekdayType()](weekdayShort(date));
 }
 
 /**
@@ -558,7 +565,7 @@ function updateDate() {
 	} else {
 		altDate += lunarMonthDay;
 	}
-	altDate += LONG_SPACE + weekdayLong(currDate) + LONG_SPACE + altTime;
+	altDate += LONG_SPACE + dayOfWeek(currDate, true) + LONG_SPACE + altTime;
 
 	setText('alt-calendar-name', calendarInfo.name);
 
@@ -571,17 +578,42 @@ function updateDate() {
 
 	setText('western-date', altDate);
 
-	let jieQiSimplified = lunarDate.getPrevJieQi(true).getName();
-	let jieQi = SOLAR_TERMS_TRADITIONAL[jieQiSimplified] ?? jieQiSimplified;
-
+	let jieQi = replaceAll(lunarDate.getPrevJieQi(true).getName(), SOLAR_TERMS_TRADITIONAL);
 	setText('curr-jieqi', jieQi);
 }
 
-// Update everything on load
-updateDate();
-navigator.geolocation.getCurrentPosition((position) => {
-	updateWeather(position.coords.latitude, position.coords.longitude);
+/**
+ * Update the whole website and save settings.
+ */
+function updateEverything() {
+	updateDate();
+	navigator.geolocation.getCurrentPosition((position) => {
+		updateWeather(position.coords.latitude, position.coords.longitude);
+	});
+}
+
+// Get previous settings from localstorage
+document.getElementById("settings")
+	.querySelectorAll("input, select")
+	.forEach(input =>
+{
+	const savedValue = localStorage.getItem(input.id || input.name);
+
+	// Skip this field if there is no saved value
+	if (savedValue === null || savedValue === undefined) {
+		return;
+	}
+
+	// Change the selection to match local storage
+	if (input.type === "checkbox" || input.type === "radio") {
+        input.checked = savedValue === "true";
+    } else {
+        input.value = savedValue;
+    }
 });
+
+// Update everything on load
+updateEverything();
 
 // Update date widget every 5 secs
 setInterval(() => {
@@ -599,10 +631,6 @@ setInterval(() => {
 document.addEventListener('input', event => {
     // Check if the changed element is an input or a select
     if (['INPUT', 'SELECT'].includes(event.target.tagName)) {
-        updateDate();
-
-		navigator.geolocation.getCurrentPosition((position) => {
-			updateWeather(position.coords.latitude, position.coords.longitude);
-		});
+        updateEverything();
     }
 });
