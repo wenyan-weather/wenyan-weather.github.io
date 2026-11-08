@@ -202,7 +202,7 @@ class LunarDateInfo {
 		// On special days of the month, as defined by DAYS_OF_MONTH, we need to display the day of the month
 		let specialLunarDay =
 			(this.lunarDay == 1)
-			? hanziNum(this.lunarDate.getMonth()) + MONTH
+			? this.lunarDate.getMonthInChinese()
 			: (DAYS_OF_MONTH[this.lunarDay] ?? "");
 		// If it's a jieqi start day, that takes precedence
 		this.specialDayString = this.jieQi ? this.jieQi : specialLunarDay;
