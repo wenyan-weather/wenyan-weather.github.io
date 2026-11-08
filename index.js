@@ -101,13 +101,13 @@ const WEEKDAY_NAMES = {
 		"亢牛婁鬼",
 		"氐女胃柳"
 	]
-}
+};
 
-const WEEKDAY_NAME_PREFIX = {
-	"yaori": "曜日",
-	"number": "星期",
-	"mansions": ""
-}
+const FULL_WEEKDAY_NAME = {
+	"yaori": name => name + "曜日",
+	"number": name => "星期" + name,
+	"mansions": name => name
+};
 
 const JAPAN_CALENDAR_FORMATTER = new Intl.DateTimeFormat('ja-JP-u-ca-japanese', {
 	era: 'long',
@@ -138,7 +138,7 @@ const CALENDARS = {
 		"gregorian": true,
 	},
 	"huangdi": {
-		"name": "黃帝紀年",
+		"name": "黃帝",
 		"gregorian": false,
 		"getYearName": date => shortHanziNum(
 			// 2697 BC
@@ -274,6 +274,14 @@ function temperatureText(temp) {
  */
 function lunarYearsSince(year, date) {
 	return Lunar.fromDate(date).getYear() - year + 1
+}
+
+function weekdayShort(date) {
+	return WEEKDAY_NAMES[weekdayType()][date.getDay()];
+}
+
+function weekdayLong(date) {
+	return FULL_WEEKDAY_NAME[weekdayType()](weekdayShort(date));
 }
 
 /**
@@ -526,9 +534,6 @@ function updateDate() {
 
 	// Other components of a date
 
-	let dayOfWeek = 曜日順序[currDate.getDay()] + "曜日";
-	let ganzhi = lunarDate.getDayInGanZhi();
-
 	let lunarMonthDay =
 		lunarDate.getMonthInChinese() + MONTH
 		+ lunarDate.getDayInChinese();
@@ -546,14 +551,14 @@ function updateDate() {
 	} else {
 		altDate += lunarMonthDay;
 	}
-	altDate += LONG_SPACE + dayOfWeek + LONG_SPACE + altTime;
+	altDate += LONG_SPACE + weekdayLong(currDate) + LONG_SPACE + altTime;
 
 	setText('alt-calendar-name', calendarInfo.name);
 
 	setText('lunar-date',
 		lunarDate.getYearInGanZhiExact() + YEAR
 		+ lunarMonthDay
-		+ LONG_SPACE + ganzhi
+		+ LONG_SPACE + lunarDate.getDayInGanZhi()
 		+ LONG_SPACE + chineseTime
 	);
 
