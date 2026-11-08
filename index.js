@@ -185,7 +185,7 @@ class LunarDateInfo {
 	constructor(date) {
 		this.lunarDate = Lunar.fromDate(date);
 		this.lunarDay = this.lunarDate.getDay();
-		this.yaori = 曜日順序[date.getDay()];
+		this.weekdayShort = weekdayShort(date);
 		this.jiazi = this.lunarDate.getDayInGanZhi();
 
 		// Get jieQi, but we need to convert from simp to trad
@@ -497,7 +497,7 @@ function updateWeather(lat, long) {
 			let lowEl = document.createElement('td');
 
 			jieqiEl.textContent = currDayInfo.specialDayString;
-			headerEl.textContent = currDayInfo.jiazi + LONG_SPACE + currDayInfo.yaori;
+			headerEl.textContent = currDayInfo.jiazi + LONG_SPACE + currDayInfo.weekdayShort;
 			weatherEl.textContent = WEATHER_CODES[weather.daily.weather_code[i]];
 			highEl.textContent = temperatureText(weather.daily.temperature_2m_max[i]);
 			lowEl.textContent = temperatureText(weather.daily.temperature_2m_min[i]);
