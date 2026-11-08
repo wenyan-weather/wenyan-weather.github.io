@@ -615,6 +615,9 @@ function updateDate() {
  * Update the whole website and save settings.
  */
 function updateEverything() {
+	// Update font
+	document.body.style.fontFamily = document.getElementById('font-select').value;
+
 	updateDate();
 	navigator.geolocation.getCurrentPosition((position) => {
 		updateWeather(position.coords.latitude, position.coords.longitude);
