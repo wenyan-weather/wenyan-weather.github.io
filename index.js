@@ -201,6 +201,13 @@ const CALENDARS = {
 	}
 };
 
+// Conversions from Celsius to the given unit
+const TEMP_CONVERSIONS = {
+	"celsius": c => c,
+	"fahrenheit": c => 1.8 * c + 32,
+	"kelvin": c => c + 273.15
+};
+
 /**
  * Lunar info about a date object.
  */
@@ -285,12 +292,14 @@ function hanziDigits(n) {
 }
 
 /**
- * Converts a temperature as a Number to text indicating that it is a temperature.
+ * Converts a temperature in Celsius as a Number to text indicating that it is a temperature.
  * 
- * For example, 13.9 becomes 十四度.
+ * For example, 13.9 becomes 十四度, assuming the temperature unit is Celsius.
  */
-function temperatureText(temp) {
-	return shortHanziNum(Math.round(temp)) + DEGREE_SYMBOL;
+function temperatureText(tempCelsius) {
+	let tempUnit = document.getElementById('temp-unit-select').value;
+	let convertedTemp = TEMP_CONVERSIONS[tempUnit](tempCelsius);
+	return shortHanziNum(Math.round(convertedTemp)) + DEGREE_SYMBOL;
 }
 
 function dayOfWeek(date, long) {
