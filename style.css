@@ -41,8 +41,17 @@ footer, .notice {
   text-align: right;
 }
 
+.force-ltr * {
+  unicode-bidi: bidi-override;
+  text-align: right;
+}
+
 .left-align {
     text-align: left;
+}
+
+.right-align {
+    text-align: right;
 }
 
 #hourly {
