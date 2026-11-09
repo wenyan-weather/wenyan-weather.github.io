@@ -31,10 +31,11 @@ h3 {
 
 b {
     font-weight: bolder;
+    margin-bottom: 8px;
 }
 
 th td {
-    margin-bottom: 10px;
+    padding: 8px;
 }
 
 .notice {
