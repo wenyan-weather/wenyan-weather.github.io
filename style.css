@@ -34,8 +34,12 @@ b {
     margin-bottom: 8px;
 }
 
-th, td {
-    padding: 4px;
+#daily th, #daily td {
+    padding-bottom: 4px;
+}
+
+#hourly th, #hourly td {
+    padding-left: 4px;
 }
 
 .notice {
