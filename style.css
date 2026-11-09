@@ -30,8 +30,11 @@ h3 {
 }
 
 b {
-    margin-bottom: 10px;
     font-weight: bolder;
+}
+
+th td {
+    margin-bottom: 10px;
 }
 
 .notice {
