@@ -34,8 +34,7 @@ b {
     margin-bottom: 8px;
 }
 
-th td {
-    display: flex;
+th, td {
     padding: 8px;
 }
 
