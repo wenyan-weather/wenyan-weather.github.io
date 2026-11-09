@@ -84,6 +84,14 @@ const BEAUFORT_SCALE = {
 	184: "強烈颱風"
 };
 
+const UV_INDEX_NAMES = {
+	0: "無曬傷",
+	3: "曬傷弱",
+	6: "曬傷强",
+	8: "曬傷甚",
+	11: "曬傷險"
+};
+
 const WEATHER_IMAGES = {
 	"0": "clear",
 	"1": "partlySunny",
@@ -377,16 +385,34 @@ function windText(speedKmh) {
 }
 
 /**
+ * Maps a number to its name based on categories defined in `categories`. For example, if `categories` is
+ * ```
+ * { 1: "a", 5: "b", 10: "c" }
+ * ```
+ * then any number >= 1 and < 5 is mapped to "a", any number >= 5 and < 10 is mapped to "b", and any number >= 10 is mapped to "c".
+ */
+function categorize(categories, number) {
+	let output;
+	Object.entries(BEAUFORT_SCALE).forEach(([minValue, name]) => {
+		if (number >= Number(minValue)) {
+			output = name;
+		}
+	});
+	return output;
+}
+
+/**
  * Finds the Beaufort scale name corresponding to the given wind speed in kmh.
  */
 function beaufort(speedKmh){
-	let beaufortScale;
-	Object.entries(BEAUFORT_SCALE).forEach(([maxWindSpd, name]) => {
-		if (speedKmh >= Number(maxWindSpd)) {
-			beaufortScale = name;
-		}
-	});
-	return beaufortScale;
+	return categorize(BEAUFORT_SCALE, speedKmh);
+}
+
+/**
+ * Finds the UV index description corresponding to the given UV index.
+ */
+function uv_index_name(index) {
+	return categorize(UV_INDEX_NAMES, index);
 }
 
 function dayOfWeek(date, long) {
@@ -528,6 +554,8 @@ function updateWeather(lat, long) {
 
 		/* Curr weather */
 
+		let weatherName = WEATHER_CODES[weather.current.weather_code];
+
 		let actTemp = Math.round(weather.current.temperature_2m);
 		let feelTemp = Math.round(weather.current.apparent_temperature);
 		// We only display "feels like" if the feels like temp is diff from true temp
@@ -543,16 +571,20 @@ function updateWeather(lat, long) {
 		let windSpd = weather.current.wind_speed_10m;
 		let gustSpd = weather.current.wind_gusts_10m;
 
-		let gust = windSpd == gustSpd ? "" : (`俄風${windText(gustSpd)}` + LONG_SPACE);
+		let beaufortText = beaufort(windSpd);
+		let gustText = windSpd == gustSpd ? "" : (`俄風${windText(gustSpd)}` + LONG_SPACE);
 
-		setText('curr-weather', WEATHER_CODES[weather.current.weather_code] + LONG_SPACE + beaufort(windSpd) + LONG_SPACE + currTemp);
-		setText('beaufort-wind', beaufort(windSpd));
-		setText('wind-info', windText(windSpd) + LONG_SPACE + gust + windDir);
+		setText('curr-weather', weatherName + LONG_SPACE + beaufortText + LONG_SPACE + currTemp);
+		setText('beaufort-wind', beaufortText);
+		setText('wind-info', windText(windSpd) + LONG_SPACE + gustText + windDir);
 
 		// Update background image
 		let imageName = WEATHER_IMAGES[weather.current.weather_code];
 		document.body.style.backgroundImage = `url('photos/${imageName}.jpg')`;
 		document.body.classList.add("weather-image");
+
+		// Update title
+		document.title = `${weatherName}${currTemp}${beaufortText}`;
 
 		/* Hourly weather */
 
