@@ -537,7 +537,8 @@ function updateWeather(lat, long) {
 		let gust = windSpd == gustSpd ? "" : (`俄風${windText(gustSpd)}` + LONG_SPACE);
 
 		setText('curr-weather', WEATHER_CODES[weather.current.weather_code] + LONG_SPACE + beaufort(windSpd) + LONG_SPACE + currTemp);
-		setText('wind-info', beaufort(windSpd) + LONG_SPACE + windText(windSpd) + LONG_SPACE + gust + windDir);
+		setText('beaufort-wind', beaufort(windSpd));
+		setText('wind-info', windText(windSpd) + LONG_SPACE + gust + windDir);
 
 		// Update background image
 		let imageName = WEATHER_IMAGES[weather.current.weather_code];
