@@ -558,6 +558,7 @@ function updateWeather(lat, long) {
 
 		// Set curr weather
 		setText('curr-hour-weather', WEATHER_CODES[weather.current.weather_code]);
+		setText('curr-hour-wind', beaufort(weather.current.wind_speed_10m));
 		setText('curr-hour-temp', temperatureText(actTemp));
 
 		for(let i = 1; i < weather.hourly.time.length; ++i) {
@@ -611,6 +612,7 @@ function updateWeather(lat, long) {
 
 		setText('today-solar-term', todayInfo.specialDayString);
 		setText('today-weather', WEATHER_CODES[weather.daily.weather_code[0]]);
+		setText('today-wind', beaufort(weather.daily.wind_speed_10m_max));
 		setText('today-high', temperatureText(weather.daily.temperature_2m_max[0]));
 		setText('today-low', temperatureText(weather.daily.temperature_2m_min[0]));
 
