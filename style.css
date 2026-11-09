@@ -35,6 +35,7 @@ b {
 }
 
 th td {
+    display: flex;
     padding: 8px;
 }
 
