@@ -240,6 +240,12 @@ const CALENDARS = {
 	}
 };
 
+const FONTS = {
+	"serif": `"SimSun", "Songti SC", "STSong", "华文宋体", "宋体", serif`,
+	"sans-serif": `-apple-system, "PingFang SC", "Microsoft YaHei", "Heiti SC", "黑体", sans-serif`,
+	"cursive": `"KaiTi", "STKaiti", "楷体", "华文楷体", serif`
+};
+
 // Conversions from Celsius to the given unit
 const TEMP_CONVERSIONS = {
 	"celsius": c => c,
@@ -708,7 +714,8 @@ function updateDate() {
  */
 function updateEverything() {
 	// Update font
-	document.body.style.fontFamily = document.getElementById('font-select').value;
+	let fontType = document.getElementById('font-select').value;
+	document.body.style.fontFamily = FONTS[fontType];
 
 	updateDate();
 	navigator.geolocation.getCurrentPosition((position) => {
