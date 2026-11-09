@@ -325,6 +325,9 @@ function setText(id, text) {
  * Converts a number to a Hanzi string, with zero displayed as 〇.
  */
 function hanziNum(n) {
+	if (n == 0)
+		return DIGITS[zeroType()][0];
+
 	return cn.numberToChinese(n)
 		.replace("零", "")
 		.replace("〇", "")
