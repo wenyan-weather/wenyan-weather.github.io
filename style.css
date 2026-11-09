@@ -81,7 +81,7 @@ a:active {
 
 .widget {
     height: fit-content;
-    background-color: color-mix(in srgb, blanchedalmond 20%, transparent);
+    background-color: color-mix(in srgb, blanchedalmond 30%, transparent);
     border-radius: 5px;
     padding: 10px;
     margin-left: 10px;
