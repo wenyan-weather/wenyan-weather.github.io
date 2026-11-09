@@ -433,7 +433,7 @@ async function getWeather(lat, long) {
 	const params = {
 		latitude: lat,
 		longitude: long,
-		daily: ["temperature_2m_max", "temperature_2m_min", "weather_code", "sunrise", "sunset"],
+		daily: ["temperature_2m_max", "temperature_2m_min", "weather_code", "sunrise", "sunset", "wind_speed_10m_max"],
 		hourly: ["temperature_2m", "precipitation_probability", "precipitation", "rain", "wind_speed_10m", "wind_gusts_10m", "weather_code"],
 		current: ["temperature_2m", "relative_humidity_2m", "apparent_temperature", "wind_speed_10m", "wind_direction_10m", "wind_gusts_10m", "precipitation", "rain", "showers", "snowfall", "weather_code"],
 		timezone: "auto",
@@ -503,6 +503,7 @@ async function getWeather(lat, long) {
 			sunset: [...Array(daily.variables(4).valuesInt64Length())].map(
 				(_ , i) => new Date((Number(daily.variables(4).valuesInt64(i))) * 1000)
 			),
+			wind_speed_10m_max: daily.variables(5).valuesArray()
 		},
 	};
 
@@ -579,21 +580,21 @@ function updateWeather(lat, long) {
 			let sunriseSunsetEl = document.createElement('td');
 			let headerEl = document.createElement('th');
 			let weatherEl = document.createElement('td');
-			let tempEl = document.createElement('td');
 			let windEl = document.createElement('td');
+			let tempEl = document.createElement('td');
 
 			sunriseSunsetEl.textContent = sunriseSunsetText;
 			headerEl.textContent = jiaziHour(date.getHours());
 			weatherEl.textContent = WEATHER_CODES[weather.hourly.weather_code[i]];
+			windEl.textContent = beaufort(weather.hourly.wind_speed_10m[i]);
 			tempEl.textContent = temperatureText(weather.hourly.temperature_2m[i]);
 			tempEl.classList.add('left-align');
-			windEl.textContent = beaufort(weather.hourly.wind_speed_10m);
 
 			newRow.appendChild(sunriseSunsetEl);
 			newRow.appendChild(headerEl);
 			newRow.appendChild(weatherEl);
-			newRow.appendChild(tempEl);
 			newRow.appendChild(windEl);
+			newRow.appendChild(tempEl);
 			hourlyTable.appendChild(newRow);
 		}
 
@@ -621,17 +622,20 @@ function updateWeather(lat, long) {
 			let jieqiEl = document.createElement('td');
 			let headerEl = document.createElement('th');
 			let weatherEl = document.createElement('td');
+			let windEl = document.createElement('td');
 			let highEl = document.createElement('td');
 			let lowEl = document.createElement('td');
 
 			jieqiEl.textContent = currDayInfo.specialDayString;
 			headerEl.textContent = currDayInfo.jiazi + LONG_SPACE + currDayInfo.weekdayShort;
 			weatherEl.textContent = WEATHER_CODES[weather.daily.weather_code[i]];
+			windEl.textContent = beaufort(weather.daily.wind_speed_10m_max[i]);
 			highEl.textContent = temperatureText(weather.daily.temperature_2m_max[i]);
 			lowEl.textContent = temperatureText(weather.daily.temperature_2m_min[i]);
 			newRow.appendChild(jieqiEl);
 			newRow.appendChild(headerEl);
 			newRow.appendChild(weatherEl);
+			newRow.appendChild(windEl);
 			newRow.appendChild(highEl);
 			newRow.appendChild(lowEl);
 			dailyTable.appendChild(newRow);
