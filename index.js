@@ -367,6 +367,19 @@ function windText(speedKmh) {
 	return SPEED_LABELS[speedUnit](shortHanziNum(Math.round(convertedSpeed)));
 }
 
+/**
+ * Finds the Beaufort scale name corresponding to the given wind speed in kmh.
+ */
+function beaufort(speedKmh){
+	let beaufortScale;
+	Object.entries(BEAUFORT_SCALE).forEach(([maxWindSpd, name]) => {
+		if (speedKmh >= Number(maxWindSpd)) {
+			beaufortScale = name;
+		}
+	});
+	return beaufortScale;
+}
+
 function dayOfWeek(date, long) {
 	switch (weekdayType()) {
 		case "yaori": {
@@ -421,7 +434,7 @@ async function getWeather(lat, long) {
 		latitude: lat,
 		longitude: long,
 		daily: ["temperature_2m_max", "temperature_2m_min", "weather_code", "sunrise", "sunset"],
-		hourly: ["temperature_2m", "precipitation_probability", "precipitation", "rain", "wind_speed_10m", "wind_direction_10m", "wind_gusts_10m", "showers", "snowfall", "weather_code"],
+		hourly: ["temperature_2m", "precipitation_probability", "precipitation", "rain", "wind_speed_10m", "wind_gusts_10m", "weather_code"],
 		current: ["temperature_2m", "relative_humidity_2m", "apparent_temperature", "wind_speed_10m", "wind_direction_10m", "wind_gusts_10m", "precipitation", "rain", "showers", "snowfall", "weather_code"],
 		timezone: "auto",
 		past_hours: 0,
@@ -466,11 +479,8 @@ async function getWeather(lat, long) {
 			precipitation: hourly.variables(2).valuesArray(),
 			rain: hourly.variables(3).valuesArray(),
 			wind_speed_10m: hourly.variables(4).valuesArray(),
-			wind_direction_10m: hourly.variables(5).valuesArray(),
-			wind_gusts_10m: hourly.variables(6).valuesArray(),
-			showers: hourly.variables(7).valuesArray(),
-			snowfall: hourly.variables(8).valuesArray(),
-			weather_code: hourly.variables(9).valuesArray(),
+			wind_gusts_10m: hourly.variables(5).valuesArray(),
+			weather_code: hourly.variables(6).valuesArray(),
 		},
 		daily: {
 			time: Array.from(
@@ -523,17 +533,10 @@ function updateWeather(lat, long) {
 		let windSpd = weather.current.wind_speed_10m;
 		let gustSpd = weather.current.wind_gusts_10m;
 
-		let beaufortScale;
-		Object.entries(BEAUFORT_SCALE).forEach(([maxWindSpd, name]) => {
-			if (windSpd >= Number(maxWindSpd)) {
-				beaufortScale = name;
-			}
-		});
-
 		let gust = windSpd == gustSpd ? "" : (`俄風${windText(gustSpd)}` + LONG_SPACE);
 
 		setText('curr-weather', WEATHER_CODES[weather.current.weather_code] + LONG_SPACE + currTemp);
-		setText('wind-info', beaufortScale + LONG_SPACE + windText(windSpd) + LONG_SPACE + gust + windDir);
+		setText('wind-info', beaufort(windSpd) + LONG_SPACE + windText(windSpd) + LONG_SPACE + gust + windDir);
 
 		// Update background image
 		let imageName = WEATHER_IMAGES[weather.current.weather_code];
@@ -577,16 +580,20 @@ function updateWeather(lat, long) {
 			let headerEl = document.createElement('th');
 			let weatherEl = document.createElement('td');
 			let tempEl = document.createElement('td');
+			let windEl = document.createElement('td');
 
 			sunriseSunsetEl.textContent = sunriseSunsetText;
 			headerEl.textContent = jiaziHour(date.getHours());
 			weatherEl.textContent = WEATHER_CODES[weather.hourly.weather_code[i]];
 			tempEl.textContent = temperatureText(weather.hourly.temperature_2m[i]);
 			tempEl.classList.add('left-align');
+			windEl.textContent = beaufort(weather.hourly.wind_speed_10m);
+			
 			newRow.appendChild(sunriseSunsetEl);
 			newRow.appendChild(headerEl);
 			newRow.appendChild(weatherEl);
 			newRow.appendChild(tempEl);
+			newRow.appendChild(windEl);
 			hourlyTable.appendChild(newRow);
 		}
 
