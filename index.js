@@ -558,11 +558,12 @@ function updateWeather(lat, long) {
 
 		let actTemp = Math.round(weather.current.temperature_2m);
 		let feelTemp = Math.round(weather.current.apparent_temperature);
+		let feelsLikeText = FEELS_LIKE + temperatureText(feelTemp);
 		// We only display "feels like" if the feels like temp is diff from true temp
 		let currTemp = temperatureText(actTemp) + (
 			(actTemp === feelTemp)
 				? ("")
-				: (LONG_SPACE + FEELS_LIKE + temperatureText(feelTemp))
+				: (LONG_SPACE + feelsLikeText)
 		);
 
 		// Find the cardinal wind direction
@@ -584,7 +585,7 @@ function updateWeather(lat, long) {
 		document.body.classList.add("weather-image");
 
 		// Update title
-		document.title = `${weatherName}${currTemp}${beaufortText}`;
+		document.title = `${weatherName} ${feelsLikeText}${beaufortText}`;
 
 		/* Hourly weather */
 
