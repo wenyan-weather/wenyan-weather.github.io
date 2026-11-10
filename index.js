@@ -23,6 +23,8 @@ const DIRECTIONS = ["北", "東北", "東", "東南", "南", "西南", "西", "�
 const DEGREES_IN_CIRCLE = 360;
 const DIR_INTERVAL = DEGREES_IN_CIRCLE / DIRECTIONS.length;
 
+const HOURS_IN_DAY = 24;
+
 const LONG_SPACE = "　";
 
 const WEATHER_CODES = {
@@ -170,6 +172,7 @@ const DIGITS = {
 
 const 曜日順序 = "日月火水木金土";
 const 星期順序 = "日一二三四五六";
+const 更之順序 = "初二三四五";
 
 const JAPAN_CALENDAR_FORMATTER = new Intl.DateTimeFormat('ja-JP-u-ca-japanese', {
 	era: 'long',
@@ -454,6 +457,20 @@ function jiaziHour(hourNum) {
 }
 
 /**
+ * Converts an hour number to the 更 system, assuming 三更 at exactly midnight (hourNum = 0) and each 更 spaced out 2 hours. If the hourNum is not on a 更, an empty string is returned.
+ */
+function hourToGeng(hourNum) {
+	if (hourNum % 2 != 1)
+		return "";
+
+	let geng = (hourNum / 2 + 4) % 12;
+	if (geng >= 5)
+		return "";
+
+	return 更之順序[geng];
+}
+
+/**
  * Gets the ke number based on the number of minutes that have passed in this hour.
  */
 function keFromMins(mins) {
@@ -612,18 +629,22 @@ function updateWeather(lat, long) {
 
 		for(let i = 1; i < weather.hourly.time.length; ++i) {
 			let date = weather.hourly.time[i];
+			let day = date.getDay();
+			let hours = date.getHours();
 			let sunriseSunsetText = "";
 
 			if (
-				sunrises.some((sunrise, i, _) => sunrise.getDay() == date.getDay()
-				&& sunrise.getHours() == date.getHours())
+				sunrises.some((sunrise, _, _) => sunrise.getDay() == day
+				&& sunrise.getHours() == hours)
 			) {
 				sunriseSunsetText = SUNRISE;
 			} else if (
-				sunsets.some((sunset, i, _) => sunset.getDay() == date.getDay()
-				&& sunset.getHours() == date.getHours())
+				sunsets.some((sunset, _, _) => sunset.getDay() == day
+				&& sunset.getHours() == hours)
 			) {
 				sunriseSunsetText = SUNSET;
+			} else {
+				sunriseSunsetText = hourToGeng(hours);
 			}
 
 			let newRow = document.createElement('tr');
@@ -634,7 +655,7 @@ function updateWeather(lat, long) {
 			let tempEl = document.createElement('td');
 
 			sunriseSunsetEl.textContent = sunriseSunsetText;
-			headerEl.textContent = jiaziHour(date.getHours());
+			headerEl.textContent = jiaziHour(hours);
 			weatherEl.textContent = WEATHER_CODES[weather.hourly.weather_code[i]];
 			windEl.textContent = beaufort(weather.hourly.wind_speed_10m[i]);
 			tempEl.textContent = temperatureText(weather.hourly.temperature_2m[i]);
