@@ -626,6 +626,7 @@ function updateWeather(lat, long) {
 		setText('curr-hour-weather', WEATHER_CODES[weather.current.weather_code]);
 		setText('curr-hour-wind', beaufort(weather.current.wind_speed_10m));
 		setText('curr-hour-temp', temperatureText(actTemp));
+		setText('curr-hour-geng', hourToGeng(weather.hourly.time[0].getHours()));
 
 		for(let i = 1; i < weather.hourly.time.length; ++i) {
 			let date = weather.hourly.time[i];
