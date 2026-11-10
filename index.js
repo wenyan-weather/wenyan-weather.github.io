@@ -467,7 +467,7 @@ function hourToGeng(hourNum) {
 	if (geng >= 5)
 		return "";
 
-	return 更之順序[geng];
+	return 更之順序[geng] + "更";
 }
 
 /**
