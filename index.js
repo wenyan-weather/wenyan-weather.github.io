@@ -688,6 +688,7 @@ function updateWeather(lat, long) {
 	}).catch(error => {
 		document.title = "未求氣候";
 		setText("summary", "未求氣候。請更新網站網絡。");
+		console.log("Couldn't get weather :(");
 	});
 }
 
