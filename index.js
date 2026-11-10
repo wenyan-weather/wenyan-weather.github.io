@@ -634,12 +634,12 @@ function updateWeather(lat, long) {
 			let sunriseSunsetText = "";
 
 			if (
-				sunrises.some((sunrise, _, _) => sunrise.getDay() == day
+				sunrises.some((sunrise, i, _) => sunrise.getDay() == day
 				&& sunrise.getHours() == hours)
 			) {
 				sunriseSunsetText = SUNRISE;
 			} else if (
-				sunsets.some((sunset, _, _) => sunset.getDay() == day
+				sunsets.some((sunset, i, _) => sunset.getDay() == day
 				&& sunset.getHours() == hours)
 			) {
 				sunriseSunsetText = SUNSET;
