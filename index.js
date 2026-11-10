@@ -685,7 +685,10 @@ function updateWeather(lat, long) {
 			newRow.appendChild(lowEl);
 			dailyTable.appendChild(newRow);
 		}
-	})
+	}).catch(error => {
+		document.title = "未求氣候";
+		setText("summary", "未求氣候。請更新網站網絡。");
+	});
 }
 
 /**
