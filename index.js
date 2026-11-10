@@ -463,7 +463,7 @@ function hourToGeng(hourNum) {
 	if (hourNum % 2 != 1)
 		return "";
 
-	let geng = (hourNum / 2 + 4) % 12;
+	let geng = (hourNum / 2 + 2.5) % 12;
 	if (geng >= 5)
 		return "";
 
