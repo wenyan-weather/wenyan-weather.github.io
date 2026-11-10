@@ -297,6 +297,12 @@ class LunarDateInfo {
 	}
 }
 
+function errorHandler(error) {
+	document.title = "未求氣候";
+	setText("summary", "未求氣候。請更新網站網絡。");
+	console.log("Couldn't get weather :(");
+}
+
 /**
  * Makes a series of text replacements in a string.
  * @param {*} text The text to transform.
@@ -685,11 +691,7 @@ function updateWeather(lat, long) {
 			newRow.appendChild(lowEl);
 			dailyTable.appendChild(newRow);
 		}
-	}).catch(error => {
-		document.title = "未求氣候";
-		setText("summary", "未求氣候。請更新網站網絡。");
-		console.log("Couldn't get weather :(");
-	});
+	}).catch(errorHandler);
 }
 
 /**
@@ -758,9 +760,9 @@ function updateEverything() {
 	document.body.style.fontFamily = FONTS[fontType];
 
 	updateDate();
-	navigator.geolocation.getCurrentPosition((position) => {
+	navigator.geolocation.getCurrentPosition(position => {
 		updateWeather(position.coords.latitude, position.coords.longitude);
-	});
+	}, errorHandler);
 }
 
 // Get previous settings from localstorage
@@ -795,7 +797,7 @@ setInterval(() => {
 setInterval(() => {
 	navigator.geolocation.getCurrentPosition((position) => {
 		updateWeather(position.coords.latitude, position.coords.longitude);
-	});
+	}, errorHandler);
 }, 60 * 1000);
 
 // User changed a setting
