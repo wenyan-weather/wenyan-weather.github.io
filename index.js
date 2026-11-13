@@ -348,7 +348,8 @@ function hanziNum(n) {
 	return cn.numberToChinese(n)
 		.replace("零", "")
 		.replace("〇", "")
-		.replace("一十", "十");
+		.replace("一十", "十")
+		.replace("负", "負");
 }
 
 /**
