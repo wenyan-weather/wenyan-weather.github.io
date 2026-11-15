@@ -296,7 +296,7 @@ class LunarDateInfo {
 			? date.getMonth() + MONTH
 			: "";
 		if (this.solarDay % 5 == 0) {
-			this.specialSolarDay = this.solarDay + DAY;
+			this.specialSolarDay = shortHanziNum(this.solarDay) + DAY;
 		}
 
 		// On special days of the month, as defined by DAYS_OF_MONTH, we need to display the day of the month
