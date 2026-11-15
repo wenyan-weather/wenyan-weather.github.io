@@ -293,7 +293,7 @@ class LunarDateInfo {
 
 		this.specialSolarDay =
 			(this.solarDay == 1)
-			? date.getMonth() + MONTH
+			? shortHanziNum(date.getMonth()) + MONTH
 			: "";
 		if (this.solarDay % 5 == 0) {
 			this.specialSolarDay = shortHanziNum(this.solarDay) + DAY;
