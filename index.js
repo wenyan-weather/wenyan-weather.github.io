@@ -285,16 +285,26 @@ const SPEED_LABELS = {
 class LunarDateInfo {
 	constructor(date) {
 		this.lunarDate = Lunar.fromDate(date);
+		this.solarDay = date.getDate();
 		this.lunarDay = this.lunarDate.getDay();
 		this.weekdayShort = dayOfWeek(date, false);
 		this.jiazi = this.lunarDate.getDayInGanZhi();
 		this.jieQi = replaceAll(this.lunarDate.getJieQi(), SOLAR_TERMS_TRADITIONAL);
+
+		this.specialSolarDay =
+			(this.solarDay == 1)
+			? date.getMonth() + MONTH
+			: "";
+		if (this.solarDay % 5 == 0) {
+			this.specialSolarDay = this.solarDay + DAY;
+		}
 
 		// On special days of the month, as defined by DAYS_OF_MONTH, we need to display the day of the month
 		let specialLunarDay =
 			(this.lunarDay == 1)
 			? this.lunarDate.getMonthInChinese() + MONTH
 			: (DAYS_OF_MONTH[this.lunarDay] ?? "");
+
 		// If it's a jieqi start day, that takes precedence
 		this.specialDayString = this.jieQi ? this.jieQi : specialLunarDay;
 	}
@@ -682,6 +692,7 @@ function updateWeather(lat, long) {
 		// Set current weather
 		let todayInfo = new LunarDateInfo(weather.current.time);
 
+		setText('today-solar-day', todayInfo.specialSolarDay);
 		setText('today-solar-term', todayInfo.specialDayString);
 		setText('today-weather', WEATHER_CODES[weather.daily.weather_code[0]]);
 		setText('today-wind', beaufort(weather.daily.wind_speed_10m_max[0]));
@@ -693,6 +704,7 @@ function updateWeather(lat, long) {
 			let currDayInfo = new LunarDateInfo(weather.daily.time[i]);
 
 			let newRow = document.createElement('tr');
+			let solarEl = document.createElement('th');
 			let jieqiEl = document.createElement('td');
 			let headerEl = document.createElement('th');
 			let weatherEl = document.createElement('td');
@@ -700,12 +712,14 @@ function updateWeather(lat, long) {
 			let highEl = document.createElement('td');
 			let lowEl = document.createElement('td');
 
+			solarEl.textContent = currDayInfo.specialSolarDay;
 			jieqiEl.textContent = currDayInfo.specialDayString;
 			headerEl.textContent = currDayInfo.jiazi + LONG_SPACE + currDayInfo.weekdayShort;
 			weatherEl.textContent = WEATHER_CODES[weather.daily.weather_code[i]];
 			windEl.textContent = beaufort(weather.daily.wind_speed_10m_max[i]);
 			highEl.textContent = temperatureText(weather.daily.temperature_2m_max[i]);
 			lowEl.textContent = temperatureText(weather.daily.temperature_2m_min[i]);
+			newRow.appendChild(solarEl);
 			newRow.appendChild(jieqiEl);
 			newRow.appendChild(headerEl);
 			newRow.appendChild(weatherEl);
